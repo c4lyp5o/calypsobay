@@ -1,0 +1,14 @@
+html
+  head
+    title= title
+    link(rel='stylesheet', href='https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css')
+    script(type='text/javascript', src='https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js')
+    link(rel='stylesheet', href='/styles/style.css')
+  body
+    nav
+      .nav-wrapper
+        a.brand-logo.center(href='/') #{title}
+        ul#nav-mobile.right.hide-on-med-and-down
+          li
+            a(href='/login') Login
+    block content

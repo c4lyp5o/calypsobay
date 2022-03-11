@@ -1,0 +1,13 @@
+extends layout
+
+block content
+  p Hello anon!
+  
+  form(action='/' enctype='multipart/form-data' method='POST') 
+    legend Upload any image you want here
+    br
+    label(for='theimage') Select a file:
+    input#theimage(type='file' name='theimage')
+    br
+    br
+    input(type="submit", value="Submit", class="btn btn-primary")

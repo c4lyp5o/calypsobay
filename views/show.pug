@@ -1,0 +1,18 @@
+extends layout
+
+block content
+  .divider 
+  p.center-align File Name: #{paste.name}
+  p.center-align Size: #{paste.itsSize}
+  .divider
+  p.center.align Your drop URL is:
+  p.center-align
+    - var url = 'http://localhost:3000/drops/' + paste.uniqueID
+    a(href=url) #{url}
+  if paste.created_by == 'Public'
+    p.center-align
+      | You cannot edit this drop. Please 
+      a(href='/users/login') login
+      |  to edit your paste
+  else
+    p #{paste.created_by}
