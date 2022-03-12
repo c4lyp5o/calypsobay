@@ -11,3 +11,19 @@ block content
     br
     br
     input(type="submit", value="Submit", class="btn btn-primary")
+    br
+    br
+    .divider 
+    br
+      
+  if item != null
+    each item in bayImg
+      tr 
+      td 
+        img(src='/images/' + item.filename)
+        br
+        a(href='/images/' + item.filename) Download
+
+  else
+    p(class='center-align') No images uploaded yet
+  

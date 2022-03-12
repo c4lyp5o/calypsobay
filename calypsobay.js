@@ -5,27 +5,29 @@ const bodyParser = require('body-parser');
 const morgan = require('morgan');
 const path = require('path');
 const mongoose = require('mongoose');
+const _ = require('lodash');
+const fileUpload = require('express-fileupload');
 require('dotenv').config();
-
-// init routes
-const theBay = require('./routes/calypsobay');
 
 // create express app
 const app = express();
 
+// enable middleware
+app.use(fileUpload({createParentPath: true}));
+app.use(cors());
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({extended: true}));
+app.use(morgan('dev'));
+app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static(path.join(__dirname, 'uploads')));
+
+// init routes
+const theBay = require('./routes/calypsobay');
+app.use('/', theBay);
+
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'pug');
-
-// add other middleware
-app.use(cors());
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
-app.use(morgan('dev'));
-app.use(express.static(path.join(__dirname, 'public')));
-
-// add routes
-app.use('/', theBay);
 
 // init DB
 const db = 'mongodb://localhost:27017/calypsobay';

@@ -3,10 +3,55 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 
 // init db
-const theBay = require('../models/calypsobay');
+const Bay = require('../models/calypsobay').Bay;
+const User = require('../models/calypsobay').User;
 
 exports.whoAreYou = (req, res) => {
-    res.render('index', { title: 'Calypsobay' });
+    res.render('index', { title: 'Calypsobay', bayImg: null });
+};
+
+exports.whoAreYou_posting = async (req, res, next) => {
+  console.log(req.files);
+    try {
+      if(!req.files) {
+          res.send({
+              status: false,
+              message: 'No file uploaded'
+          });
+      } else {
+          const unique = Crypto.randomBytes(3*24).toString('hex');
+          //Use the name of the input field to retrieve the uploaded file
+          let theimage = req.files.theimage;
+          
+          //Use the mv() method to place the file in upload directory (i.e. "uploads")
+          theimage.mv('./uploads/' + "calypsobay-" + theimage.name);
+
+          // save details to db
+          const pasted = new Bay({
+            name: theimage.name,
+            created_at: Date.now(),
+            created_by: 'Public',
+            uniqueID: unique,
+            itsPath: '/uploads/' + "calypsobay-" + theimage.name,
+            itsSize: theimage.size
+          })
+
+          pasted.save();
+
+          //send response
+          res.send({
+              status: true,
+              message: 'File is uploaded',
+              data: {
+                  name: theimage.name,
+                  mimetype: theimage.mimetype,
+                  size: theimage.size
+              }
+          });
+      }
+  } catch (err) {
+      res.status(500).send(err);
+  }
 };
 
 exports.registerUserForm = async (req, res, next) => {
