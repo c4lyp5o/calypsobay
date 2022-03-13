@@ -11,43 +11,33 @@ exports.whoAreYou = (req, res) => {
 };
 
 exports.whoAreYou_posting = async (req, res, next) => {
-  console.log(req.files);
     try {
       if(!req.files) {
           res.send({
               status: false,
               message: 'No file uploaded'
           });
-      } else {
-          const unique = Crypto.randomBytes(3*24).toString('hex');
-          //Use the name of the input field to retrieve the uploaded file
-          let theimage = req.files.theimage;
-          
-          //Use the mv() method to place the file in upload directory (i.e. "uploads")
-          theimage.mv('./uploads/' + "calypsobay-" + theimage.name);
+      } else {        
+        const fileX = Crypto.randomBytes(2*2).toString('hex');
+        const unique = Crypto.randomBytes(3*24).toString('hex');
+        let theimage = req.files.theimage;
+        const fileName = 'bay-' + fileX + '.' + theimage.mimetype.split('/')[1];                     
+        theimage.mv('./uploads/' + fileName);
+        const thePath = '../' + fileName;
 
-          // save details to db
-          const pasted = new Bay({
-            name: theimage.name,
-            created_at: Date.now(),
-            created_by: 'Public',
-            uniqueID: unique,
-            itsPath: '/uploads/' + "calypsobay-" + theimage.name,
-            itsSize: theimage.size
-          })
+        // save details to db
+        const pasted = new Bay({
+          created_at: Date.now(),
+          created_by: 'Public',
+          uniqueID: unique,
+          itsPath: thePath,
+          itsSize: theimage.size
+        })
 
           pasted.save();
 
           //send response
-          res.send({
-              status: true,
-              message: 'File is uploaded',
-              data: {
-                  name: theimage.name,
-                  mimetype: theimage.mimetype,
-                  size: theimage.size
-              }
-          });
+          res.render('show', { title: 'Calypsobay', paste: pasted });
       }
   } catch (err) {
       res.status(500).send(err);
@@ -61,27 +51,25 @@ exports.registerUserForm = async (req, res, next) => {
 exports.registerUser = async (req, res, next) => {    
     try {
     // get details from body
-    const { first_name, last_name, email, password } = req.body;
-    if (!(email && password && first_name && last_name)) {
+    const { userName, password } = req.body;
+    if (!(userName && password)) {
       res.status(400).send("All input is required");
     }
     // check if user exist
-    const oldUser = await theBay.User.findOne({ email: email });
+    const oldUser = await User.findOne({ user_name: userName });
     if (oldUser) {
       return res.status(409).send("User Already Exist. Please Login");
     }
     //Encrypt user password
     encryptedPassword = await bcrypt.hash(password, 10);
     // Create user in our database
-    const user = await theBay.create({
-      first_name,
-      last_name,
-      email: email.toLowerCase(), // sanitize: convert email to lowercase
+    const user = await User.create({
+      user_name: userName, // sanitize: convert email to lowercase
       password: encryptedPassword,
     });
     // Create token
     const token = jwt.sign(
-      { user_id: user._id, email },
+      { user_id: user._id, user_name: user.user_name },
       process.env.TOKEN_KEY,
       {
         expiresIn: "2h",
@@ -104,19 +92,19 @@ exports.loginUserForm = async (req, res, next) => {
 exports.loginUser = async (req, res, next) => {
   try {
     // Get user input
-    const { email, password } = req.body;
+    const { userName, password } = req.body;
 
     // Validate user input
-    if (!(email && password)) {
+    if (!(userName && password)) {
       res.status(400).send("All input is required");
     }
     // Validate if user exist in our database
-    const user = await theBay.findOne({ email: email });
+    const user = await User.findOne({ user_name: userName });
 
     if (user && (await bcrypt.compare(password, user.password))) {
       // Create token
       const token = jwt.sign(
-        { user_id: user._id, email, user_name: user.first_name },
+        { user_id: user._id, user_name: user.user_name },
         process.env.TOKEN_KEY,
         {
           algorithm: "HS256",
@@ -135,4 +123,16 @@ exports.loginUser = async (req, res, next) => {
   } catch (err) {
     console.log(err);
   }
+}
+
+exports.getBay = async (req, res, next) => {
+  try {
+    Bay.findOne({ uniqueID: req.params.uniqueID })
+    .exec(function (err, paste) {
+        res.render('display', { title: 'Calypsobay', paste: paste });
+    });
+    } catch (err) {
+        console.log(err);
+        res.render('404');
+    }
 }

@@ -10,5 +10,6 @@ router.get('/register', bayCommand.registerUserForm);
 router.post('/register', bayCommand.registerUser);
 router.get('/login', bayCommand.loginUserForm);
 router.post('/login', bayCommand.loginUser);
+router.get('/bays/:uniqueID', bayCommand.getBay);
 
 module.exports = router;

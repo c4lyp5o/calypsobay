@@ -5,3 +5,15 @@ body {
   a {
     color: #00B7FF;
   }
+
+  .container {
+    overflow: hidden;
+    width: 25%;
+    height: auto;
+  }
+  
+  .container img {
+    object-fit: f;
+    width: 100%;
+    min-height: 100%;
+  }
