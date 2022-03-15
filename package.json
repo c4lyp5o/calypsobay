@@ -14,7 +14,7 @@
     "anon"
   ],
   "author": "c4lyp5o",
-  "license": "ISC",
+  "license": "GPL-3.0-or-later",
   "dependencies": {
     "bcrypt": "^5.0.1",
     "body-parser": "^1.19.2",
@@ -27,5 +27,14 @@
     "mongoose": "^6.2.5",
     "morgan": "^1.10.0",
     "pug": "^3.0.2"
-  }
+  },
+  "devDependencies": {},
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/c4lyp5o/calypsobay.git"
+  },
+  "bugs": {
+    "url": "https://github.com/c4lyp5o/calypsobay/issues"
+  },
+  "homepage": "https://github.com/c4lyp5o/calypsobay#readme"
 }

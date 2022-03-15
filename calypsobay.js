@@ -30,9 +30,8 @@ app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'pug');
 
 // init DB
-const db = 'mongodb://localhost:27017/calypsobay';
 mongoose
-  .connect(db, {
+  .connect(process.env.MONGODB_URI, {
     useNewUrlParser: true,
     useUnifiedTopology: true
   })
