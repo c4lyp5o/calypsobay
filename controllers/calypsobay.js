@@ -7,8 +7,16 @@ const Bay = require('../models/calypsobay').Bay;
 const User = require('../models/calypsobay').User;
 
 exports.whoAreYou = (req, res) => {
-    res.render('index', { title: 'Calypsobay', bayImg: null });
-};
+    Bay.find({})
+    .sort([[ 'created_at', 'descending' ]])
+    .exec(function (err, bays) {
+        if (err) {
+            res.send(err);
+        }
+        // console.log(bays);
+        res.render('index', { title: 'Calypsobay', bays: bays, user: 'Public' });
+      });
+  }  
 
 exports.whoAreYou_posting = async (req, res, next) => {
     try {
@@ -24,8 +32,6 @@ exports.whoAreYou_posting = async (req, res, next) => {
         const fileName = 'bay-' + fileX + '.' + theimage.mimetype.split('/')[1];                     
         theimage.mv('./uploads/' + fileName);
         const thePath = '../' + fileName;
-
-        // save details to db
         const pasted = new Bay({
           created_at: Date.now(),
           created_by: 'Public',
@@ -33,10 +39,7 @@ exports.whoAreYou_posting = async (req, res, next) => {
           itsPath: thePath,
           itsSize: theimage.size
         })
-
           pasted.save();
-
-          //send response
           res.render('show', { title: 'Calypsobay', paste: pasted });
       }
   } catch (err) {
@@ -50,24 +53,19 @@ exports.registerUserForm = async (req, res, next) => {
 
 exports.registerUser = async (req, res, next) => {    
     try {
-    // get details from body
     const { userName, password } = req.body;
     if (!(userName && password)) {
       res.status(400).send("All input is required");
     }
-    // check if user exist
     const oldUser = await User.findOne({ user_name: userName });
     if (oldUser) {
       return res.status(409).send("User Already Exist. Please Login");
     }
-    //Encrypt user password
     encryptedPassword = await bcrypt.hash(password, 10);
-    // Create user in our database
     const user = await User.create({
-      user_name: userName, // sanitize: convert email to lowercase
+      user_name: userName, 
       password: encryptedPassword,
     });
-    // Create token
     const token = jwt.sign(
       { user_id: user._id, user_name: user.user_name },
       process.env.TOKEN_KEY,
@@ -75,14 +73,11 @@ exports.registerUser = async (req, res, next) => {
         expiresIn: "2h",
       }
     );
-    // save user token
     user.token = token;
-    // return new user
     res.redirect('/');
   } catch (err) {
     console.log(err);
   }
-  // Our register logic ends here
 }
 
 exports.loginUserForm = async (req, res, next) => {
@@ -91,16 +86,11 @@ exports.loginUserForm = async (req, res, next) => {
 
 exports.loginUser = async (req, res, next) => {
   try {
-    // Get user input
     const { userName, password } = req.body;
-
-    // Validate user input
     if (!(userName && password)) {
       res.status(400).send("All input is required");
     }
-    // Validate if user exist in our database
     const user = await User.findOne({ user_name: userName });
-
     if (user && (await bcrypt.compare(password, user.password))) {
       // Create token
       const token = jwt.sign(
@@ -111,11 +101,7 @@ exports.loginUser = async (req, res, next) => {
           expiresIn: "5m",
         }
       );
-
-      // save user token
       user.token = token;
-
-      // user
       res.cookie("token", token, { maxAge: 60000 });
       return res.redirect('/users/welcome');
     }
@@ -135,4 +121,14 @@ exports.getBay = async (req, res, next) => {
         console.log(err);
         res.render('404');
     }
+}
+
+exports.logoutUser = async (req, res) => {
+  try {
+      res.clearCookie('token');
+      res.redirect('/');
+  } catch (err) {
+      console.log(err);
+      res.render('404');
+  }
 }

@@ -2,18 +2,24 @@ body {
     padding: 50px;
   }
   
-  a {
+a {
     color: #00B7FF;
   }
 
-  .container {
+.container {
     overflow: hidden;
     width: 25%;
     height: auto;
   }
   
-  .container img {
-    object-fit: f;
+.container img {
+    object-fit: fill;
     width: 100%;
     min-height: 100%;
   }
+
+img.resize {
+    align-items: center;
+    width: 100%; /* you can use % */
+    height: auto;
+}

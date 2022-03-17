@@ -9,6 +9,14 @@ html
       .nav-wrapper
         a.brand-logo.center(href='/') #{title}
         ul#nav-mobile.right.hide-on-med-and-down
-          li
-            a(href='/login') Login
+          if user != 'Public'
+            li
+              a(href='/files') Your Files
+            li
+              a(href='/logout') Logout
+          else
+            li
+              a(href='/login') Login
+            li
+              a(href='/register') Register
     block content

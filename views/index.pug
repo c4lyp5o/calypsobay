@@ -1,29 +1,54 @@
 extends layout
 
 block content
-  p Hello anon!
-  
-  form(action='/' enctype='multipart/form-data' method='POST') 
-    legend Upload any image you want here
-    br
-    label(for='theimage') Select a file:
-    input#theimage(type='file' name='theimage')
-    br
-    br
-    input(type="submit", value="Submit", class="btn btn-primary")
-    br
-    br
-    .divider 
-    br
-      
-  if item != null
-    each item in bayImg
-      tr 
-      td 
-        img(src='/images/' + item.filename)
-        br
-        a(href='/images/' + item.filename) Download
+  if msg
+    p.center-align #{msg}
 
+  if user != 'Public'
+    h1.center-align Hello #{user}
   else
-    p(class='center-align') No images uploaded yet
+    h1.center-align Hello anon!
+
+  form(action='/' enctype='multipart/form-data' method='POST') 
+    p.center-align Upload anything you want here
+    br
+    .file-field.input-field
+      .btn
+        span Choose File
+        input(type='file' name='theimage' accept='image/*')
+      .file-path-wrapper
+        input.file-path.validate(type='text')
+    p.center-align
+      button.btn.waves-effect.waves-light.center-align(type='submit' name='action') Upload
+  .divider
+
+  div
+    h3(align='center') Latest Images
+    
+    if bays.length > 0
+      .uk-divider-icon  
+      table.uk-table.uk-table-small.uk-table-striped
+        thead
+          - var n = 0;
+          - var i = 0;      
+            while i < 9
+              tr
+                td 
+                  img.resize.theimage(src=`${bays[i].itsPath}` alt='Your_Image')
+                  - n++;
+                  - i++;
+                td 
+                  img.resize.theimage(src=`${bays[i].itsPath}` alt='Your_Image')                  
+                  - n++;
+                  - i++;
+                td 
+                  img.resize.theimage(src=`${bays[i].itsPath}` alt='Your_Image')                  
+                  - n++;
+                  - i++;
+              if n > 2
+                br
+              
+
+    else
+      p(class='center-align') No images uploaded yet
   

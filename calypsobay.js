@@ -1,8 +1,9 @@
 const express = require('express');
 const createError = require('http-errors');
 const cors = require('cors');
-const bodyParser = require('body-parser');
-const morgan = require('morgan');
+// const bodyParser = require('body-parser');
+// const morgan = require('morgan');
+// const cookieParser = require('cookie-parser');
 const path = require('path');
 const mongoose = require('mongoose');
 const _ = require('lodash');
@@ -13,11 +14,14 @@ require('dotenv').config();
 const app = express();
 
 // enable middleware
-app.use(fileUpload({createParentPath: true}));
 app.use(cors());
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({extended: true}));
-app.use(morgan('dev'));
+app.use(fileUpload({createParentPath: true}));
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+// app.use(cookieParser());
+// app.use(bodyParser.json());
+// app.use(bodyParser.urlencoded({extended: true}));
+// app.use(morgan('dev'));
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.static(path.join(__dirname, 'uploads')));
 
